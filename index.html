@@ -181,13 +181,18 @@
   ];
 
   var TOTAL = 320;
-  var state = { score:0, done:{1:false,2:false,3:false,4:false}, best:{} };
+  var state = { done:{1:false,2:false,3:false,4:false}, levelScore:{1:0,2:0,3:0,4:0} };
+  var runScore = 0;
+  function total(){
+    return state.levelScore[1] + state.levelScore[2] + state.levelScore[3] + state.levelScore[4];
+  }
+  function paintHud(){ document.getElementById("hudScore").textContent = total() + runScore; }
 
   // ---------- helpers ----------
   function el(html){ var d = document.createElement("div"); d.innerHTML = html.trim(); return d.firstChild; }
   function shuffle(arr){ var a = arr.slice(); for (var i=a.length-1;i>0;i--){ var j = Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
   function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
-  function addScore(n){ state.score += n; document.getElementById("hudScore").textContent = state.score; }
+  function addScore(n){ runScore += n; paintHud(); }
   function setProgress(pct){ document.getElementById("progress").style.width = Math.max(0, Math.min(100,pct)) + "%"; }
   var screenEl = document.getElementById("screen");
 
@@ -231,6 +236,7 @@
   }
 
   function startLevel(n){
+    runScore = 0;
     if (n === 1) levelChoice(1, L1, "Look at or Look for?");
     else if (n === 2) levelChoice(2, L2, "Do or Make?");
     else if (n === 3) levelTimer();
@@ -406,10 +412,14 @@
   }
 
   // ---------- finish ----------
-  function finishLevel(levelNum, right, total){
+  function finishLevel(levelNum, right, qTotal){
     state.done[levelNum] = true;
-    var stars = right === total ? "⭐⭐⭐" : (right >= total*0.7 ? "⭐⭐☆" : "⭐☆☆");
-    var msg = right === total ? "Perfect level!" : (right >= total*0.7 ? "Nice work!" : "Good try. Play it again.");
+    var earned = right * 10;
+    if (earned > state.levelScore[levelNum]) state.levelScore[levelNum] = earned;
+    runScore = 0;
+    paintHud();
+    var stars = right === qTotal ? "⭐⭐⭐" : (right >= qTotal*0.7 ? "⭐⭐☆" : "⭐☆☆");
+    var msg = right === qTotal ? "Perfect level!" : (right >= qTotal*0.7 ? "Nice work!" : "Good try. Play it again.");
     sndWin();
     setProgress(100);
 
@@ -417,8 +427,8 @@
     screenEl.innerHTML = '<div class="screen"><div class="card finish">' +
       '<div class="stars">'+stars+'</div>' +
       '<h2>'+msg+'</h2>' +
-      '<p>'+right+' of '+total+' correct</p>' +
-      '<div class="score">'+state.score+'<small> / '+TOTAL+'</small></div>' +
+      '<p>'+right+' of '+qTotal+' correct</p>' +
+      '<div class="score">'+total()+'<small> / '+TOTAL+'</small></div>' +
       '<div class="row" style="width:100%">' +
         '<button class="btn ghost" id="again">Play again</button>' +
         '<button class="btn" id="next">'+nextLabel+'</button>' +
@@ -435,14 +445,15 @@
   function finale(){
     setProgress(100);
     var doneCount = Object.keys(state.done).filter(function(k){ return state.done[k]; }).length;
-    var line = state.score >= 300 ? "You know these verbs." :
-               state.score >= 200 ? "Almost there. Play the hard level again." :
+    var t = total();
+    var line = t >= 300 ? "You know these verbs." :
+               t >= 200 ? "Almost there. Play the hard level again." :
                "Good start. Play again tomorrow.";
     screenEl.innerHTML = '<div class="screen"><div class="card finish">' +
       '<div class="stars">🏆</div>' +
       '<h2>Quest complete</h2>' +
       '<p>'+line+'</p>' +
-      '<div class="score">'+state.score+'<small> / '+TOTAL+'</small></div>' +
+      '<div class="score">'+total()+'<small> / '+TOTAL+'</small></div>' +
       '<p class="tiny">'+doneCount+' of 4 levels finished</p>' +
       '<button class="btn" id="back">Back to levels</button>' +
     '</div></div>';
