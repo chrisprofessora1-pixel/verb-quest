@@ -17,40 +17,48 @@
   body{min-height:100vh;display:flex;justify-content:center;
     background:radial-gradient(1200px 600px at 50% -10%,#1d2a55 0%,#0d1020 60%)}
   #app{width:100%;max-width:620px;padding:14px 14px 22px;display:flex;flex-direction:column;gap:10px;min-height:100vh}
-  .hud{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:.02em}
+  .hud{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:.02em;
+    position:sticky;top:0;z-index:30;background:#0d1020;padding:8px 0;margin:-8px 0 2px;
+    box-shadow:0 10px 14px -12px #000}
   .hud .spacer{flex:1}
   .pill{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 11px;color:var(--dim)}
   .pill b{color:var(--gold)}
   .iconbtn{background:var(--card);border:1px solid var(--line);border-radius:10px;width:34px;height:34px;
     display:grid;place-items:center;font-size:15px;cursor:pointer;color:var(--txt);padding:0}
+  .navbtn{font-family:inherit;border:0;border-radius:999px;padding:9px 13px;font-size:12.5px;font-weight:800;
+    color:#fff;background:linear-gradient(180deg,#6b57ff,#5a45e6);box-shadow:0 3px 0 #3f2fb0;
+    cursor:pointer;white-space:nowrap;letter-spacing:.01em}
+  .navbtn:active{transform:translateY(2px);box-shadow:0 1px 0 #3f2fb0}
   .bar{height:7px;border-radius:999px;background:var(--card);border:1px solid var(--line);overflow:hidden}
   .bar>i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--cyan),var(--purple));
     transition:width .35s ease}
   .screen{flex:1;display:flex;flex-direction:column;gap:12px;animation:fade .25s ease}
   @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-  h1{font-size:30px;line-height:1.05;margin:6px 0 0;letter-spacing:-.02em}
+  h1{font-size:26px;line-height:1.05;margin:2px 0 0;letter-spacing:-.02em}
   h1 span{color:var(--cyan)}
   h2{font-size:19px;margin:0;letter-spacing:-.01em}
   p{margin:0;color:var(--dim);line-height:1.45;font-size:14.5px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
-  .btn{appearance:none;border:0;border-radius:14px;padding:14px 18px;font-size:16px;font-weight:800;
+  .btn{appearance:none;border:0;border-radius:14px;padding:13px 18px;font-size:16px;font-weight:800;
     font-family:inherit;cursor:pointer;background:linear-gradient(180deg,#6b57ff,#5a45e6);color:#fff;
     box-shadow:0 6px 0 #3f2fb0;transition:transform .06s ease, box-shadow .06s ease;width:100%}
   .btn:active{transform:translateY(3px);box-shadow:0 3px 0 #3f2fb0}
   .btn.ghost{background:var(--card2);color:var(--txt);box-shadow:0 6px 0 #12172b;border:1px solid var(--line)}
   .btn.gold{background:linear-gradient(180deg,#ffcf5c,#f5b52d);color:#2b2000;box-shadow:0 6px 0 #b8820d}
-  .levels{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .levels{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   .lvl{display:flex;flex-direction:column;align-items:flex-start;gap:6px;background:var(--card);
-    border:1px solid var(--line);border-radius:14px;padding:12px;cursor:pointer;text-align:left;
+    border:1px solid var(--line);border-radius:13px;padding:10px 11px;cursor:pointer;text-align:left;
     color:var(--txt);font-family:inherit;font-size:14.5px;font-weight:750;line-height:1.2;
     transition:border-color .15s,transform .06s}
   .lvl:active{transform:scale(.99)}
   .lvl .n{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:13px;
     background:#252c4a;color:var(--cyan);flex:none}
   .lvl .t{display:flex;flex-direction:column;gap:2px}
-  .lvl .t small{font-weight:600;color:var(--dim);font-size:11.5px}
+  .lvl .t small{font-weight:600;color:var(--dim);font-size:11px}
   .lvl .st{font-size:10.5px;color:var(--gold);letter-spacing:1px}
   .lvl.done{border-color:#2f6b52;background:#152a24}
+  .lvl.next{border-color:var(--cyan)}
+  .lvl .n.go{background:var(--cyan);color:#06202a}
   .qmeta{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--dim);font-weight:700}
   .prompt{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 16px;
     font-size:21px;line-height:1.45;font-weight:650;min-height:104px;display:flex;align-items:center;
@@ -95,7 +103,7 @@
     <div class="pill">⭐ <b id="hudScore">0</b></div>
     <div class="spacer"></div>
     <button class="iconbtn" id="muteBtn" aria-label="Sound on or off">🔊</button>
-    <button class="iconbtn" id="homeBtn" aria-label="Back to levels">⌂</button>
+    <button class="navbtn" id="homeBtn" aria-label="Play another game">🎮 Play another game</button>
   </div>
   <div class="bar"><i id="progress"></i></div>
   <div id="screen" class="screen"></div>
@@ -194,11 +202,16 @@
   function shuffle(arr){ var a = arr.slice(); for (var i=a.length-1;i>0;i--){ var j = Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
   function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
   function addScore(n){ runScore += n; paintHud(); }
+  function setNav(show){
+    var b = document.getElementById("homeBtn");
+    if (b) b.style.display = show ? "" : "none";
+  }
   function setProgress(pct){ document.getElementById("progress").style.width = Math.max(0, Math.min(100,pct)) + "%"; }
   var screenEl = document.getElementById("screen");
 
   // ---------- home ----------
   function home(){
+    setNav(false);
     var doneCount = Object.keys(state.done).filter(function(k){ return state.done[k]; }).length;
     setProgress(doneCount/4*100);
     var levels = [
@@ -207,36 +220,34 @@
       {n:3, t:"Catch the Word", s:"60 second round"},
       {n:4, t:"Sentence Builder", s:"Put words in order"}
     ];
+    var nextLevel = 0;
+    for (var k=1;k<=4;k++){ if (!state.done[k]){ nextLevel = k; break; } }
+
     var html = '<div class="screen">' +
       '<h1>Verb <span>Quest</span></h1>' +
-      '<p>Four levels. Look at, look for, do and make.</p>' +
+      '<p>Tap a level. Look at, look for, do and make.</p>' +
       '<div class="levels">' +
       levels.map(function(l){
         var d = state.done[l.n];
-        return '<button class="lvl '+(d?"done":"")+'" data-lvl="'+l.n+'">' +
-          '<span class="n">'+(d?"✓":l.n)+'</span>' +
+        var isNext = !d && l.n === nextLevel;
+        return '<button class="lvl '+(d?"done ":"")+(isNext?"next":"")+'" data-lvl="'+l.n+'">' +
+          '<span class="n '+(isNext?"go":"")+'">'+(d?"✓":(isNext?"▶":l.n))+'</span>' +
           '<span class="t">'+l.t+'<small>'+l.s+'</small></span>' +
           '<span class="st">'+(d?"⭐⭐⭐":"☆☆☆")+'</span>' +
         '</button>';
       }).join("") +
       '</div>' +
-      '<button class="btn" id="playAll">Play</button>' +
       '</div>';
     screenEl.innerHTML = html;
 
     screenEl.querySelectorAll(".lvl").forEach(function(b){
       b.addEventListener("click", function(){ sndTap(); startLevel(parseInt(b.dataset.lvl,10)); });
     });
-    document.getElementById("playAll").addEventListener("click", function(){
-      sndTap();
-      var next = 1;
-      for (var i=1;i<=4;i++){ if(!state.done[i]){ next = i; break; } }
-      startLevel(next);
-    });
   }
 
   function startLevel(n){
     runScore = 0;
+    setNav(true);
     if (n === 1) levelChoice(1, L1, "Look at or Look for?");
     else if (n === 2) levelChoice(2, L2, "Do or Make?");
     else if (n === 3) levelTimer();
@@ -429,11 +440,11 @@
       '<h2>'+msg+'</h2>' +
       '<p>'+right+' of '+qTotal+' correct</p>' +
       '<div class="score">'+total()+'<small> / '+TOTAL+'</small></div>' +
+      '<button class="btn gold" id="more">🎮 Play another game</button>' +
       '<div class="row" style="width:100%">' +
         '<button class="btn ghost" id="again">Play again</button>' +
         '<button class="btn" id="next">'+nextLabel+'</button>' +
       '</div>' +
-      '<button class="btn ghost" id="more">Play another game</button>' +
     '</div></div>';
 
     document.getElementById("again").addEventListener("click", function(){ sndTap(); startLevel(levelNum); });
@@ -445,6 +456,7 @@
   }
 
   function finale(){
+    setNav(true);
     setProgress(100);
     var doneCount = Object.keys(state.done).filter(function(k){ return state.done[k]; }).length;
     var t = total();
@@ -457,7 +469,7 @@
       '<p>'+line+'</p>' +
       '<div class="score">'+total()+'<small> / '+TOTAL+'</small></div>' +
       '<p class="tiny">'+doneCount+' of 4 levels finished</p>' +
-      '<button class="btn" id="more">Play another game</button>' +
+      '<button class="btn gold" id="more">🎮 Play another game</button>' +
     '</div></div>';
     document.getElementById("more").addEventListener("click", function(){ sndTap(); home(); });
   }
