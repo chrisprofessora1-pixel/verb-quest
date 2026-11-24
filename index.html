@@ -433,6 +433,7 @@
         '<button class="btn ghost" id="again">Play again</button>' +
         '<button class="btn" id="next">'+nextLabel+'</button>' +
       '</div>' +
+      '<button class="btn ghost" id="more">Play another game</button>' +
     '</div></div>';
 
     document.getElementById("again").addEventListener("click", function(){ sndTap(); startLevel(levelNum); });
@@ -440,6 +441,7 @@
       sndTap();
       if (levelNum < 4) startLevel(levelNum + 1); else finale();
     });
+    document.getElementById("more").addEventListener("click", function(){ sndTap(); home(); });
   }
 
   function finale(){
@@ -455,9 +457,9 @@
       '<p>'+line+'</p>' +
       '<div class="score">'+total()+'<small> / '+TOTAL+'</small></div>' +
       '<p class="tiny">'+doneCount+' of 4 levels finished</p>' +
-      '<button class="btn" id="back">Back to levels</button>' +
+      '<button class="btn" id="more">Play another game</button>' +
     '</div></div>';
-    document.getElementById("back").addEventListener("click", function(){ sndTap(); home(); });
+    document.getElementById("more").addEventListener("click", function(){ sndTap(); home(); });
   }
 
   // ---------- chrome ----------
@@ -465,7 +467,7 @@
     muted = !muted;
     this.textContent = muted ? "🔇" : "🔊";
   });
-  document.getElementById("homeBtn").addEventListener("click", function(){ muted = muted; home(); });
+  document.getElementById("homeBtn").addEventListener("click", function(){ home(); });
 
   home();
 })();
